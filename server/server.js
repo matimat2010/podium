@@ -9,7 +9,25 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.post("/webhook", (req, res) => {
-    console.log(req.body); // Logs the received JSON data
+    const webhookData = req.body.data;
+    console.log("Received webhook data:", webhookData);
+
+    // Assuming the webhookData contains a field "body" with the vendor code to increment votes for
+    const { body: code } = webhookData;
+
+    // Find the index of the vendor with the matching code
+    const indexToUpdate = vendors.findIndex((vendor) => vendor.code === code);
+
+    if (indexToUpdate === -1) {
+        // If the code is not found in the array, respond with 404 Not Found
+        return res.status(404).send("Vendor not found.");
+    }
+
+    // Increment the vote count of the vendor in the "vendors" array using the index
+    vendors[indexToUpdate].votes += 1;
+
+    console.log("Vendor vote count updated:", vendors[indexToUpdate]);
+
     res.sendStatus(200); // Sends a success response to the client
 });
 
@@ -30,7 +48,8 @@ app.post("/loadvendors", (req, res) => {
         return res.status(400).send("Invalid JSON format.");
     }
 
-    res.sendStatus(200); // Sends a success response to the client
+    // Respond with a JSON object instead of a plain string
+    res.status(200).json({ message: "Vendors loaded." });
 });
 
 app.put("/updatevendor/:code", (req, res) => {
@@ -74,7 +93,7 @@ app.delete("/deletevendor/:code", (req, res) => {
     res.sendStatus(200); // Sends a success response to the client
 });
 
-app.get("/printvendors", (req, res) => {
+app.get("/viewvendors", (req, res) => {
     res.json(vendors); // Respond with the "vendors" array in JSON format
 });
 
