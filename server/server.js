@@ -1,8 +1,12 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors"); // Import the cors package
 const vendors = [];
 const app = express();
 app.use(bodyParser.json());
+
+// Enable CORS for all routes
+app.use(cors());
 
 app.post("/webhook", (req, res) => {
     console.log(req.body); // Logs the received JSON data
@@ -35,7 +39,7 @@ app.put("/updatevendor/:code", (req, res) => {
 
     // Find the index of the vendor with the matching code
     const indexToUpdate = vendors.findIndex(
-        (vendor) => vendor.Code === codeToUpdate
+        (vendor) => vendor.code === codeToUpdate
     );
 
     if (indexToUpdate === -1) {
@@ -47,7 +51,7 @@ app.put("/updatevendor/:code", (req, res) => {
     vendors[indexToUpdate] = updatedVendor;
     console.log("Vendor updated:", updatedVendor);
 
-    res.sendStatus(200); // Sends a success response to the client
+    res.status(200).json({ message: "Vendor updated successfully." });
 });
 
 app.delete("/deletevendor/:code", (req, res) => {
@@ -55,7 +59,7 @@ app.delete("/deletevendor/:code", (req, res) => {
 
     // Find the index of the vendor with the matching code
     const indexToDelete = vendors.findIndex(
-        (vendor) => vendor.Code === codeToDelete
+        (vendor) => vendor.code === codeToDelete
     );
 
     if (indexToDelete === -1) {
@@ -74,6 +78,6 @@ app.get("/printvendors", (req, res) => {
     res.json(vendors); // Respond with the "vendors" array in JSON format
 });
 
-app.listen(3000, () => {
-    console.log("Server is running on http://localhost:3000");
+app.listen(4000, () => {
+    console.log("Server is running on http://localhost:4000");
 });
