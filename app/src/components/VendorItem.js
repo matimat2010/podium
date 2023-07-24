@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import "./VendorItem.css"; // Import the CSS file
 
-function VendorItem({ vendor, onVendorUpdate }) {
+function VendorItem({ vendor, onVendorUpdate, onVendorDelete }) {
     const { category, code, name, votes } = vendor;
     const [isEditing, setIsEditing] = useState(false);
+    const [isArchived, setIsArchived] = useState(false);
     const [updatedName, setUpdatedName] = useState(name);
     const [updatedCategory, setUpdatedCategory] = useState(category);
 
@@ -28,6 +30,15 @@ function VendorItem({ vendor, onVendorUpdate }) {
         setIsEditing(false);
     };
 
+    const handleArchiveClick = () => {
+        setIsArchived(!isArchived);
+    };
+
+    const handleDeleteClick = () => {
+        // Call the API endpoint to delete the vendor
+        onVendorDelete(code);
+    };
+
     return (
         <tr>
             <td>
@@ -37,7 +48,9 @@ function VendorItem({ vendor, onVendorUpdate }) {
                         onChange={(e) => setUpdatedCategory(e.target.value)}
                     />
                 ) : (
-                    category
+                    <span className={isArchived ? "archived" : ""}>
+                        {category}
+                    </span>
                 )}
             </td>
             <td>{code}</td>
@@ -48,7 +61,7 @@ function VendorItem({ vendor, onVendorUpdate }) {
                         onChange={(e) => setUpdatedName(e.target.value)}
                     />
                 ) : (
-                    name
+                    <span className={isArchived ? "archived" : ""}>{name}</span>
                 )}
             </td>
             <td>{votes}</td>
@@ -59,7 +72,15 @@ function VendorItem({ vendor, onVendorUpdate }) {
                         <button onClick={handleCancelClick}>Cancel</button>
                     </div>
                 ) : (
-                    <button onClick={handleEditClick}>Edit</button>
+                    <div>
+                        <button onClick={handleEditClick}>Edit</button>
+                        <button onClick={handleArchiveClick}>
+                            {isArchived ? "Unarchive" : "Archive"}
+                        </button>
+                        {isArchived && (
+                            <button onClick={handleDeleteClick}>Delete</button>
+                        )}
+                    </div>
                 )}
             </td>
         </tr>
